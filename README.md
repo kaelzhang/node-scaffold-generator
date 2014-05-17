@@ -65,6 +65,7 @@ And /path/to/package.json
 - options `Object` 
     - data `Object` the data which will be substituted into the template file.
     - renderer `Object=ejs` the renderer to compile the template and apply data. The default renderer is [`ejs`](http://www.npmjs.org/package/ejs) created by TJ.
+    - override `Boolean='false'` whether should override existing files
 
 Creates an instance of scaffold-generator
 
