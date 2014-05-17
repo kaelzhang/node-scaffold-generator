@@ -3,7 +3,7 @@
 module.exports = scaffold;
 function scaffold (options) {
   options = scaffold.checkOptions(options);
-  return Scaffold(options);
+  return new Scaffold(options);
 }
 
 scaffold.checkOptions = function (options) {
@@ -93,7 +93,9 @@ Scaffold.prototype._copyFiles = function(file_map, callback) {
     var to = file_map[from];
     self._copyFile(from, to, done);
 
-  }, callback);
+  }, function (err) {
+    callback(err || null);
+  });
 };
 
 
@@ -105,12 +107,13 @@ Scaffold.prototype._copyFile = function (from, to, callback) {
   var renderer = this.options.renderer;
   // substitute file name
   to = renderer.render(to, data);
-  generator._shouldOverride(to, this.options.override, function (override) {
+  var self = this;
+  self._shouldOverride(to, this.options.override, function (override) {
     if (!override) {
       return callback(null);
     }
 
-    generator._readAndTemplate(from, data, function (err, content) {
+    self._readAndTemplate(from, data, function (err, content) {
       if (err) {
         return callback(err);
       }

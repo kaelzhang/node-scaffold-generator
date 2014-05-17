@@ -1,5 +1,4 @@
-# php files
-index.php
+test/fixtures/to/
 
 # Numerous always-ignore extensions
 *.bak
