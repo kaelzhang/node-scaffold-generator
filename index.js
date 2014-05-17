@@ -11,7 +11,7 @@ scaffold.checkOptions = function (options) {
   options.data || (options.data = {});
   options.renderer || (options.renderer = ejs);
 
-  if (!util.isFunction(options.renderer.render)) {
+  if (typeof options.renderer.render !== 'function') {
     throw new Error('`options.renderer.render` is not a function');
   }
 
@@ -26,7 +26,6 @@ var async = require('async');
 
 var fs = require('fs');
 var node_path = require('path');
-var util = require('util');
 
 // @param {Object} options
 // - data {Object} the data object to be applied to the template
