@@ -16,7 +16,7 @@ Suppose the file structure is:
 
 ```
 /path/from
-         |-- index.js
+         |-- <%=main%>.js // default to ejs template
          |-- package.json
 ```
 
@@ -24,8 +24,8 @@ And /path/from/package.json:
 
 ```json
 {
-  "name": "{{name}}",
-  "main": "{{main}}"
+  "name": "<%= name %>",
+  "main": "<%= main %>"
 }
 ```
 
@@ -36,11 +36,7 @@ scaffold({
     name: 'cortex',
     main: 'lib/index.js'
   }
-}).generate({
-  // only the path of the destination will be substituted according to the data
-  '/path/from/index.js': '/path/to/{{main}}',
-  '/path/from/package.json': '/path/to/package.json'
-}, function(err){
+}).generate('/path/from', '/path/to', function(err){
   // suppose `err` is null
 });
 ```
