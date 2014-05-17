@@ -40,6 +40,7 @@ function Scaffold(options, callback) {
 Scaffold.prototype.generate = function(from, to, callback) {
   if (Object(from) === from) {
     var file_map = from;
+    callback = to;
     return this._copyFiles(file_map, callback);
   }
 
@@ -109,7 +110,6 @@ Scaffold.prototype._copyFile = function (from, to, callback) {
   to = renderer.render(to, data);
   var self = this;
   self._shouldOverride(to, this.options.override, function (override) {
-    // console.log(to, override);
     if (!override) {
       return callback(null);
     }
@@ -130,7 +130,7 @@ Scaffold.prototype._shouldOverride = function (file, override, callback) {
     return callback(true);
   }
 
-  fs.exists(file, function (exists) {console.log('exists?', file, exists);
+  fs.exists(file, function (exists) {
     if (exists) {
       return callback(false);
     }
