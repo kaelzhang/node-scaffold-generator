@@ -109,16 +109,16 @@ Scaffold.prototype._copyFile = function (from, to, callback) {
   to = renderer.render(to, data);
   var self = this;
   self._shouldOverride(to, this.options.override, function (override) {
-    console.log(to, override);
+    // console.log(to, override);
     if (!override) {
       return callback(null);
     }
-
+console.log('read', from);
     self._readAndTemplate(from, data, function (err, content) {
       if (err) {
         return callback(err);
       }
-
+console.log('write', to, content);
       fse.outputFile(to, content, callback);
     });
   });
@@ -130,7 +130,7 @@ Scaffold.prototype._shouldOverride = function (file, override, callback) {
     return callback(true);
   }
 
-  fs.exists(file, function (exists) {
+  fs.exists(file, function (exists) {console.log('exists?', file, exists);
     if (exists) {
       return callback(false);
     }
