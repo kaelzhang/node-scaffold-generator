@@ -16,7 +16,7 @@ function expect_file (to, expected, name, expect_name) {
 }
 
 describe("scaffold-generator", function(){
-  it(".generate(from, to, callback), override=false", function(done){
+  it(".copy(from, to, callback), override=false", function(done){
     var to = tmp.make(fixtures);
     var from = node_path.join(fixtures, 'template');
     fs.write( node_path.join(to, 'lib/index.js'), 'abc');
@@ -27,7 +27,7 @@ describe("scaffold-generator", function(){
         main: 'lib/index.js'
       }
 
-    }).generate(from, to, function (err) {
+    }).copy(from, to, function (err) {
       expect_file(to, expected, 'package.json');
 
       // no change
@@ -37,7 +37,7 @@ describe("scaffold-generator", function(){
     });
   });
 
-  it(".generate(from, to, callback), override=true", function(done){
+  it(".copy(from, to, callback), override=true", function(done){
     var to = tmp.make(fixtures);
     var from = node_path.join(fixtures, 'template');
     fs.write( node_path.join(to, 'lib/index.js'), 'abc');
@@ -49,7 +49,7 @@ describe("scaffold-generator", function(){
       },
       override: true
 
-    }).generate(from, to, function (err) {
+    }).copy(from, to, function (err) {
       expect_file(to, expected, 'package.json');
       expect_file(to, expected, 'lib/index.js', 'index.js');
       expect(err).to.equal(null);
@@ -57,7 +57,7 @@ describe("scaffold-generator", function(){
     });
   });
 
-  it(".generate(map, mcallback), override=false", function(done){
+  it(".copy(map, mcallback), override=false", function(done){
     var to = tmp.make(fixtures);
     var from = node_path.join(fixtures, 'template');
     fs.write( node_path.join(to, 'lib/index.js'), 'abc');
@@ -72,7 +72,7 @@ describe("scaffold-generator", function(){
         main: 'lib/index.js'
       }
 
-    }).generate(map, function (err) {
+    }).copy(map, function (err) {
       expect_file(to, expected, 'package.json');
 
       // no change
@@ -82,7 +82,7 @@ describe("scaffold-generator", function(){
     });
   });
 
-  it(".generate(map, mcallback), override=true", function(done){
+  it(".copy(map, mcallback), override=true", function(done){
     var to = tmp.make(fixtures);
     var from = node_path.join(fixtures, 'template');
     fs.write( node_path.join(to, 'lib/index.js'), 'abc');
@@ -98,7 +98,7 @@ describe("scaffold-generator", function(){
       },
       override: true
 
-    }).generate(map, function (err) {
+    }).copy(map, function (err) {
       expect_file(to, expected, 'package.json');
       expect_file(to, expected, 'lib/index.js', 'index.js');
       expect(err).to.equal(null);
@@ -106,7 +106,7 @@ describe("scaffold-generator", function(){
     });
   });
 
-  it(".generate(file, file, callback), override=false", function(done){
+  it(".copy(file, file, callback), override=false", function(done){
     var to = tmp.make(fixtures);
     var from = node_path.join(fixtures, 'template', 'package.json');
     var file_to = node_path.join(to, 'package.json');
@@ -117,14 +117,14 @@ describe("scaffold-generator", function(){
         main: 'lib/index.js'
       }
 
-    }).generate(from, file_to, function (err) {
+    }).copy(from, file_to, function (err) {
       expect_file(to, expected, 'package.json');
       expect(err).to.equal(null);
       done();
     });
   });
 
-  it(".generate(file, dir, callback), override=false", function(done){
+  it(".copy(file, dir, callback), override=false", function(done){
     var to = tmp.make(fixtures);
     var from = node_path.join(fixtures, 'template', 'package.json');
 
@@ -134,9 +134,27 @@ describe("scaffold-generator", function(){
         main: 'lib/index.js'
       }
 
-    }).generate(from, to, function (err) {
+    }).copy(from, to, function (err) {
       expect_file(to, expected, 'package.json');
       expect(err).to.equal(null);
+      done();
+    });
+  });
+
+  it(".write(to, template, callback)", function(done){
+    var tmp_dir = tmp.make(fixtures);
+    var base = '<%=name%>';
+    var to = node_path.join(tmp_dir, base);
+
+    scaffold({
+      data: {
+        name: 'abc.js',
+        blah: 'blah'
+      }
+    }).write(to, '<%=blah%>', function () {
+      var real_to = node_path.join(tmp_dir, 'abc.js');
+      expect( fs.exists(real_to) ).to.equal(true);
+      expect( fs.read(real_to) ).to.equal('blah');
       done();
     });
   });

@@ -83,7 +83,7 @@ Generates the scaffold.
 
 Scaffold-generator never cares file renaming which you could deal with ahead of time.
 
-### .generate(from, to, callback)
+### .copy(from, to, callback)
 
 - from `path` see ['cases'](#cases) section
 - to `path` see ['cases'](#cases) section
@@ -96,16 +96,20 @@ This method will still substitute the content of template files with `options.da
 
 #### Cases
 
-##### .generate(src_dir, dest_dir, callback)
+##### .copy(src_dir, dest_dir, callback)
 
 Will try to copy all contents of `src_dir`(not `src_dir` itself) to `dest_dir`
 
-##### .generate(src_file, dest_file, callback)
+##### .copy(src_file, dest_file, callback)
 
 Will try to write to `dest_file` with the substituted content of `src_file`
 
-##### .generate(src_file, dest_dir, callback)
+##### .copy(src_file, dest_dir, callback)
 
 Will try to copy `src_file` into `dest_dir`
 
+
+### .write(to, template, callback);
+
+Writes file `to` with rendered `template` if `options.override` is `true`. 
 

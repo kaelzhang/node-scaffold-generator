@@ -36,7 +36,7 @@ function Scaffold(options, callback) {
 };
 
 
-Scaffold.prototype.generate = function(from, to, callback) {
+Scaffold.prototype.copy = function(from, to, callback) {
   if (Object(from) === from) {
     var file_map = from;
     callback = to;
@@ -44,6 +44,21 @@ Scaffold.prototype.generate = function(from, to, callback) {
   }
 
   return this._copy(from, to, callback);
+};
+
+
+Scaffold.prototype.write = function(to, template, callback) {
+  var renderer = this.options.renderer;
+  var data = this.options.data;
+  to = renderer.render(to, data);
+  this._shouldOverride(to, this.options.override, function (override) {
+    if (!override) {
+      return callback(null);
+    }
+
+    var content = renderer.render(template, data);
+    fse.outputFile(to, content, callback);
+  });
 };
 
 
