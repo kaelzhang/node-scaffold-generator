@@ -16,7 +16,7 @@ Suppose the file structure is:
 
 ```
 /path/from
-         |-- <%=main%>.js // default to ejs template
+         |-- <%=main%> // default to ejs template
          |-- package.json
 ```
 

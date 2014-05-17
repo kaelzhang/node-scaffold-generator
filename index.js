@@ -113,12 +113,12 @@ Scaffold.prototype._copyFile = function (from, to, callback) {
     if (!override) {
       return callback(null);
     }
-console.log('read', from);
+
     self._readAndTemplate(from, data, function (err, content) {
       if (err) {
         return callback(err);
       }
-console.log('write', to, content);
+
       fse.outputFile(to, content, callback);
     });
   });
