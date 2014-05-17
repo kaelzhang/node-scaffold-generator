@@ -4,6 +4,8 @@ Scaffold-generator is a scaffolding utility used to automate project creation fr
 
 Scaffold-generator could be the core utility to create something like grunt-init and [cortex](https://github.com/cortexjs/cortex)-init.
 
+`rename.json` of grunt-init is silly and scaffold-generator use template engine for both file content and file name.
+
 ## Installation
 
 ```bash
