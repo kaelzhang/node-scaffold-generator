@@ -6,6 +6,8 @@ Scaffold-generator could be the core utility to create something like grunt-init
 
 `rename.json` of grunt-init is silly and scaffold-generator use template engine for both file content and file name.
 
+You are free to safely copy several sources to their destinations with one single scaffold-generator instance!
+
 ## Installation
 
 ```bash
@@ -83,13 +85,27 @@ Scaffold-generator never cares file renaming which you could deal with ahead of 
 
 ### .generate(from, to, callback)
 
-- from `dir`
-- to `dir`
+- from `path` see ['cases'](#cases) section
+- to `path` see ['cases'](#cases) section
 - callback `function(err)`
 - err `Error`
 
 If there is no path renaming, you could simply use this method instead of `.generate(fileMap, callback)` to copy the template folder to the destination.
 
 This method will still substitute the content of template files with `options.data`.
+
+#### Cases
+
+##### .generate(src_dir, dest_dir, callback)
+
+Will try to copy all contents of `src_dir`(not `src_dir` itself) to `dest_dir`
+
+##### .generate(src_file, dest_file, callback)
+
+Will try to write to `dest_file` with the substituted content of `src_file`
+
+##### .generate(src_file, dest_dir, callback)
+
+Will try to copy `src_file` into `dest_dir`
 
 

@@ -105,4 +105,39 @@ describe("scaffold-generator", function(){
       done();
     });
   });
+
+  it(".generate(file, file, callback), override=false", function(done){
+    var to = tmp.make(fixtures);
+    var from = node_path.join(fixtures, 'template', 'package.json');
+    var file_to = node_path.join(to, 'package.json');
+
+    scaffold({
+      data: {
+        name: 'cortex',
+        main: 'lib/index.js'
+      }
+
+    }).generate(from, file_to, function (err) {
+      expect_file(to, expected, 'package.json');
+      expect(err).to.equal(null);
+      done();
+    });
+  });
+
+  it(".generate(file, dir, callback), override=false", function(done){
+    var to = tmp.make(fixtures);
+    var from = node_path.join(fixtures, 'template', 'package.json');
+
+    scaffold({
+      data: {
+        name: 'cortex',
+        main: 'lib/index.js'
+      }
+
+    }).generate(from, to, function (err) {
+      expect_file(to, expected, 'package.json');
+      expect(err).to.equal(null);
+      done();
+    });
+  });
 });

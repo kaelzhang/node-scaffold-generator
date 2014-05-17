@@ -43,7 +43,32 @@ Scaffold.prototype.generate = function(from, to, callback) {
     return this._copyFiles(file_map, callback);
   }
 
-  return this._copyDir(from, to, callback);
+  return this._copy(from, to, callback);
+};
+
+
+Scaffold.prototype._copy = function(from, to, callback) {
+  var self = this;
+  fs.stat(from, function (err, stat) {
+    if (err) {
+      return callback(err);
+    }
+
+    if (stat.isDirectory()) {
+      return self._copyDir(from, to, callback);
+    }
+
+    // copy file
+    fs.stat(to, function (err, stat) {
+      if (!err && stat.isDirectory()) {
+        var name = node_path.basename(from);
+        to = node_path.join(to, name);
+      }
+
+      // If error, maybe `to` is not exists, we just try to copy.
+      return self._copyFile(from, to, callback);
+    });
+  });
 };
 
 
@@ -77,7 +102,7 @@ Scaffold.prototype._globDir = function (root, callback) {
       return callback(err);
     }
 
-    files = files.filter(REGEX_FILE.test, REGEX_FILE)
+    files = files.filter(REGEX_FILE.test, REGEX_FILE);
     callback(null, files);
   });
 };
