@@ -109,6 +109,7 @@ Scaffold.prototype._copyFile = function (from, to, callback) {
   to = renderer.render(to, data);
   var self = this;
   self._shouldOverride(to, this.options.override, function (override) {
+    console.log(to, override);
     if (!override) {
       return callback(null);
     }
