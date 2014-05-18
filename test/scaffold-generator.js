@@ -33,6 +33,9 @@ describe("scaffold-generator", function(){
       // no change
       expect( fs.read(node_path.join(to, 'lib/index.js')) ).to.equal('abc');
       expect(err).to.equal(null);
+
+      // .dot file
+      expect( fs.exists(to, '.gitignore') ).to.equal(true);
       done();
     });
   });
