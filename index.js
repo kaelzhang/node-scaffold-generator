@@ -21,7 +21,7 @@ scaffold.checkOptions = function (options) {
 
 var fse = require('fs-extra');
 var glob = require('glob');
-var ejs = require('ejs');
+var ejs = require('ejs-harmony');
 var async = require('async');
 
 var fs = require('fs');
