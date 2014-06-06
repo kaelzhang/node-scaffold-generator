@@ -55,6 +55,29 @@ describe("scaffold-generator", function(){
     }).copy(from, to, function (err) {
       expect_file(to, expected, 'package.json');
       expect_file(to, expected, 'lib/index.js', 'index.js');
+      expect(fs.exists(to, 'lib/index.js.bak')).to.equal(true);
+      expect(err).to.equal(null);
+      done();
+    });
+  });
+
+  it(".copy(from, to, callback), override=true, noBackup=true", function(done){
+    var to = tmp.make(fixtures);
+    var from = node_path.join(fixtures, 'template');
+    fs.write( node_path.join(to, 'lib/index.js'), 'abc');
+
+    scaffold({
+      data: {
+        name: 'cortex',
+        main: 'lib/index.js'
+      },
+      override: true,
+      noBackup: true
+
+    }).copy(from, to, function (err) {
+      expect_file(to, expected, 'package.json');
+      expect_file(to, expected, 'lib/index.js', 'index.js');
+      expect(fs.exists(to, 'lib/index.js.bak')).to.equal(false);
       expect(err).to.equal(null);
       done();
     });
