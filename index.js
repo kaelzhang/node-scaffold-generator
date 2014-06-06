@@ -30,7 +30,8 @@ var node_path = require('path');
 // @param {Object} options
 // - data {Object} the data object to be applied to the template
 // - renderer {Object}
-// - override `Boolean='false'` whether should override existing files
+// - override {Boolean=false} whether should override existing files
+// - noBackup {Boolean=false} if override an existing file, a .bak file will be saved
 function Scaffold(options, callback) {
   this.options = options;
 };
@@ -166,13 +167,24 @@ Scaffold.prototype._copyFile = function (from, to, callback) {
 
 
 Scaffold.prototype._shouldOverride = function (file, override, callback) {
-  if (override) {
-    return callback(true);
-  }
-
+  var bak = !this.options.noBackup;
   fs.exists(file, function (exists) {
     if (exists) {
-      return callback(false);
+      if (override) {
+        if (bak) {
+          var bak_file = file + '.bak';
+          // Save a '.bak' file
+          return fse.copy(file, bak_file, function () {
+            callback(true);
+          });
+
+        } else {
+          return callback(true);
+        }
+        
+      } else {
+        return callback(false);
+      }
     }
 
     callback(true);
