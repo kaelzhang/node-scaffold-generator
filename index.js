@@ -6,10 +6,38 @@ function scaffold (options) {
   return new Scaffold(options);
 }
 
+// For windows
+var NO_SUPPORTED_CHARS = /[\\\/:*"<>|]/
+
 scaffold.checkOptions = function (options) {
   options || (options = {});
   options.data || (options.data = {});
-  options.renderer || (options.renderer = ejs);
+  var open = options.open || '{%';
+  var close = options.close || '%}';
+
+  if (!options.noCheckTag) {
+    if (NO_SUPPORTED_CHARS.test(open) || NO_SUPPORTED_CHARS.test(close)) {
+      throw new Error(
+        '`open` or `close` tag is not supported in Windows.\n'
+        + 'It should not contain \\ / : * " < > |\n'
+        + 'Or you could set `options.noCheckTag` to `true` to ignore this error.'
+      );
+    }
+  }
+
+  options.renderer || (options.renderer = {
+    render: function (str, data) {
+      // `ejs` confuse data with options, but there is no way out.
+      // Dame it!
+      data.open = open;
+      data.close = close;
+      return ejs.render(str, data);
+    }
+  });
+
+  if (typeof options.renderer !== 'object') {
+    throw new Error('`options.renderer` is not an object');
+  }
 
   if (typeof options.renderer.render !== 'function') {
     throw new Error('`options.renderer.render` is not a function');

@@ -20,7 +20,7 @@ Suppose the file structure is:
 
 ```
 /path/from
-         |-- <%=main%> // default to ejs template
+         |-- {%=main%} // default to ejs template
          |-- package.json
 ```
 
@@ -28,8 +28,8 @@ And /path/from/package.json:
 
 ```json
 {
-  "name": "<%= name %>",
-  "main": "<%= main %>"
+  "name": "{%= name %}",
+  "main": "{%= main %}"
 }
 ```
 
@@ -69,8 +69,11 @@ And /path/to/package.json
 - options `Object` 
     - data `Object` the data which will be substituted into the template file.
     - renderer `Object=ejs` the renderer to compile the template and apply data. The default renderer is [`ejs`](http://www.npmjs.org/package/ejs) created by TJ.
-    - override `Boolean='false'` whether should override existing files
+    - override `Boolean=false` whether should override existing files
     - noBackup `Boolean=false` if noBackup is `false`, a `.bak` file will be saved when overriding an existing file.
+    - noCheckTag `Boolean=false` if `true`, it will not check the cross-platform compatibility, such as Windows.
+    - open `String='{%'` the open tag for `ejs`, default to `'{%'`
+    - close `String='%}'` the close tag, default to `'%}'`
 
 Creates an instance of scaffold-generator
 
