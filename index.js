@@ -27,6 +27,7 @@ scaffold.checkOptions = function (options) {
 
   options.renderer || (options.renderer = {
     render: function (str, data) {
+      data || (data = {});
       // `ejs` confuse data with options, but there is no way out.
       // Dame it!
       data.open = open;

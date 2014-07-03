@@ -89,7 +89,7 @@ describe("scaffold-generator", function(){
     fs.write( node_path.join(to, 'lib/index.js'), 'abc');
 
     var map = {};
-    map[ node_path.join(from, '<%=main%>') ] = node_path.join(to, 'lib/index.js');
+    map[ node_path.join(from, '{%=main%}') ] = node_path.join(to, 'lib/index.js');
     map[ node_path.join(from, 'package.json') ] = node_path.join(to, 'package.json');
 
     scaffold({
@@ -114,7 +114,7 @@ describe("scaffold-generator", function(){
     fs.write( node_path.join(to, 'lib/index.js'), 'abc');
 
     var map = {};
-    map[ node_path.join(from, '<%=main%>') ] = node_path.join(to, 'lib/index.js');
+    map[ node_path.join(from, '{%=main%}') ] = node_path.join(to, 'lib/index.js');
     map[ node_path.join(from, 'package.json') ] = node_path.join(to, 'package.json');
 
     scaffold({
@@ -169,7 +169,7 @@ describe("scaffold-generator", function(){
 
   it(".write(to, template, callback)", function(done){
     var tmp_dir = tmp.make(fixtures);
-    var base = '<%=name%>';
+    var base = '{%=name%}';
     var to = node_path.join(tmp_dir, base);
 
     scaffold({
@@ -177,7 +177,7 @@ describe("scaffold-generator", function(){
         name: 'abc.js',
         blah: 'blah'
       }
-    }).write(to, '<%=blah%>', function () {
+    }).write(to, '{%=blah%}', function () {
       var real_to = node_path.join(tmp_dir, 'abc.js');
       expect( fs.exists(real_to) ).to.equal(true);
       expect( fs.read(real_to) ).to.equal('blah');
