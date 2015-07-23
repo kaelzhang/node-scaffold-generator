@@ -1,6 +1,6 @@
 {
   "name": "scaffold-generator",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "scaffold-generator",
   "main": "index.js",
   "scripts": {
@@ -33,9 +33,9 @@
     "tmp-sync": "^0.1.1"
   },
   "dependencies": {
-    "async": "^0.9.0",
+    "async": "^1.4.0",
     "ejs-harmony": "^1.0.0",
-    "fs-extra": "^0.11.0",
-    "glob": "^4.0.0"
+    "fs-extra": "^0.22.1",
+    "glob": "^5.0.14"
   }
 }
