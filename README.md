@@ -44,12 +44,12 @@ scaffold({
     name: 'cortex',
     main: 'lib/index.js'
   }
-}).generate('/path/from', '/path/to', function(err){
+}).copy('/path/from', '/path/to', function(err){
   // suppose `err` is null
 });
 ```
 
-THen,
+Then,
 
 ```
 /path/to
@@ -92,15 +92,16 @@ Generates the scaffold.
 Scaffold-generator never cares file renaming which you could deal with ahead of time.
 
 ### .copy(from, to, callback)
+### .copy(file_map, callback)
 
 - from `path` see ['cases'](#cases) section
 - to `path` see ['cases'](#cases) section
+- file_map `Object` the `{from: to}` object
 - callback `function(err)`
 - err `Error`
 
-If there is no path renaming, you could simply use this method instead of `.generate(fileMap, callback)` to copy the template folder to the destination.
+This method will still substitute the content and the pathname of template files with `options.data`.
 
-This method will still substitute the content of template files with `options.data`.
 
 #### Cases
 
