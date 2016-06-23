@@ -72,6 +72,7 @@ And /path/to/package.json
 
 - options `Object` 
     - data `Object` the data which will be substituted into the template file.
+    - ignore `String|String[]` the ignore rule or a array of rules.
     - renderer `Object=ejs` the renderer to compile the template and apply data. The default renderer is [`ejs`](http://www.npmjs.org/package/ejs) created by TJ.
     - override `Boolean=false` whether should override existing files
     - noBackup `Boolean=false` if noBackup is `false`, a `.bak` file will be saved when overriding an existing file.
