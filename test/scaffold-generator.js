@@ -61,6 +61,31 @@ describe("scaffold-generator", function(){
     });
   });
 
+  it(".copy(from, to, callback), ignore", function(done){
+    var to = tmp.make(fixtures);
+    var from = node_path.join(fixtures, 'template');
+    fs.write( node_path.join(to, 'lib/index.js'), 'abc');
+
+    scaffold({
+      data: {
+        name: 'cortex',
+        main: 'lib/index.js'
+      },
+      ignore: ['.gitignore']
+
+    }).copy(from, to, function (err) {
+      expect_file(to, expected, 'package.json');
+
+      // no change
+      expect( fs.read(node_path.join(to, 'lib/index.js')) ).to.equal('abc');
+      expect(err).to.equal(null);
+
+      // ignored file
+      expect( fs.exists(to, '.gitignore') ).to.equal(false);
+      done();
+    });
+  });
+
   it(".copy(from, to, callback), override=true, noBackup=true", function(done){
     var to = tmp.make(fixtures);
     var from = node_path.join(fixtures, 'template');
