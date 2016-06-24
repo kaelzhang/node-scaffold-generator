@@ -141,6 +141,7 @@ Scaffold.prototype._globDir = function (root, callback) {
   glob('**/*', {
     cwd: root,
     dot: true,
+    ignore: this.options.ignore,
     // Then, the dirs in `files` will end with a slash `/`
     mark: true
   }, function (err, files) {
