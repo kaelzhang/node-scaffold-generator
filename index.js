@@ -190,7 +190,12 @@ Scaffold.prototype._copyFile = function (from, to, callback) {
         return callback(err);
       }
 
-      fse.outputFile(to, content, callback);
+      fs.stat(from, function(err, stats) {
+        if (err) {
+          return callback(err);
+        }
+          fse.outputFile(to, content, {mode : stats.mode }, callback);
+      });
     });
   });
 };
