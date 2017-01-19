@@ -33,9 +33,9 @@
     "tmp-sync": "^0.1.1"
   },
   "dependencies": {
-    "async": "^1.4.0",
+    "async": "^2.1.4",
     "ejs-harmony": "^1.0.0",
-    "fs-extra": "^0.22.1",
-    "glob": "^5.0.14"
+    "fs-extra": "^2.0.0",
+    "glob": "^7.1.1"
   }
 }
