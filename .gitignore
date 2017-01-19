@@ -14,6 +14,7 @@ test/fixtures/to/
 *.vi
 *~
 *.sass-cache
+*.lock
 
 # OS or Editor folders
 .DS_Store
