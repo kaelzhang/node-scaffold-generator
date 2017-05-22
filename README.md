@@ -5,7 +5,7 @@
 
 Scaffold-generator is a scaffolding utility used to automate project creation from the specified template and data.
 
-Scaffold-generator could be the core utility to create something like grunt-init and your yeoman generators.
+Scaffold-generator could be the core utility to create something like grunt-init and yeoman generators.
 
 `rename.json` of grunt-init is silly and scaffold-generator use template engine for both file content and file name.
 
@@ -23,7 +23,7 @@ Suppose the file structure is:
 
 ```
 /path/from
-         |-- {{main}} // default to ejs template
+         |-- {{main}}
          |-- package.json
 ```
 
@@ -40,11 +40,18 @@ And /path/from/package.json:
 const Scaffold = require('scaffold-generator')
 const mustache = require('mustache')
 
+// All variables are HTML-escaped by mustache by default,
+// and `lib/index.js` will be escaped to `lib&#x2F;index.js`.
+// To avoid this, override the `mustache.escape`
+// or triple mustache `{{{name}}}` should be used.
+mustache.escape = v => v
+
 new Scaffold({
   data: {
     name: 'my-module',
     main: 'lib/index.js'
   },
+  // function `options.render` accepts `str` and `data`, then returns a `str`
   render: mustache.render
 })
 .copy('/path/from', '/path/to')
@@ -53,7 +60,9 @@ new Scaffold({
 })
 ```
 
-Then,
+Then:
+
+File names will be substituted.
 
 ```
 /path/to
@@ -62,7 +71,7 @@ Then,
        |-- package.json
 ```
 
-And /path/to/package.json
+File contents will also be substitute. And the file `/path/to/package.json` will be
 
 ```json
 {

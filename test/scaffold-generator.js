@@ -5,6 +5,8 @@ const mustache = require('mustache')
 const path = require('path')
 const _tmp = require('tmp')
 
+mustache.escape = v => v
+
 const template = (filepath = '') =>
   path.join(__dirname, 'fixtures', 'template', filepath)
 
@@ -13,8 +15,8 @@ const expected = (filepath = '') =>
 
 
 // @param {path} dest dest dir
-async function equal (t, dest, name, equal = true) {
-  const content = await fs.readFile(path.join(dest, name))
+async function equal (t, dest, name, dest_name, equal = true) {
+  const content = await fs.readFile(path.join(dest, dest_name || name))
   const expect_content = await fs.readFile(expected(name))
 
   if (equal) {
@@ -30,7 +32,7 @@ async function equal (t, dest, name, equal = true) {
 
 
 function notEqual (t, d, n) {
-  return equal(t, d, n, false)
+  return equal(t, d, n, undefined, false)
 }
 
 
@@ -73,6 +75,19 @@ test('copy, override=false, not exists', async t => {
 
   await equal(t, to, 'index.js')
   await equal(t, to, 'package.json')
+})
+
+test.only('copy, override=false, not exists, hierachical dirs', async t => {
+  const to = await tmp()
+  await s({
+    data: {
+      name: 'foo',
+      main: 'lib/index.js'
+    }
+  })
+  .copy(template(), to)
+
+  await equal(t, to, 'index.js', 'lib/index.js')
 })
 
 
