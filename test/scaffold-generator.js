@@ -1,211 +1,128 @@
 const test = require('ava')
-const scaffold = require('../')
+const Scaffold = require('../index')
 const fs = require('fs-extra')
 const mustache = require('mustache')
 const path = require('path')
+const _tmp = require('tmp')
 
-const fixtures = (filepath = '') => path.join(__dirname, 'fixtures', filepath)
-const expected = (filepath = '') => path.join(__dirname, 'expected', filepath)
+const template = (filepath = '') =>
+  path.join(__dirname, 'fixtures', 'template', filepath)
+
+const expected = (filepath = '') =>
+  path.join(__dirname, 'fixtures', 'expected', filepath)
 
 
-function expect_file (to, expected, name, expect_name) {
-  var content = fs.read( node_path.join(to, name) )
-  var expect_content = fs.read( node_path.join(expected, expect_name || name) )
-   expect(content).to.equal(expect_content)
+// @param {path} dest dest dir
+async function equal (t, dest, name, equal = true) {
+  const content = await fs.readFile(path.join(dest, name))
+  const expect_content = await fs.readFile(expected(name))
+
+  if (equal) {
+    t.is(content.toString(), expect_content.toString(),
+      `content not the same: ${dest}/${name}`)
+    return
+  }
+
+  if (content.toString() === expect_content.toString()) {
+    t.fail(`should not equal: ${dest}/${name}`)
+  }
 }
 
-describe("scaffold-generator", function(){
-  it(".copy(from, to, callback), override=false", function(done){
-    var to = tmp.make(fixtures)
-    var from = node_path.join(fixtures, 'template')
-    fs.write( node_path.join(to, 'lib/index.js'), 'abc')
 
-    scaffold({
-      data: {
-        name: 'cortex',
-        main: 'lib/index.js'
+function notEqual (t, d, n) {
+  return equal(t, d, n, false)
+}
+
+
+async function expect (t, dest, name, expect_content) {
+  const content = await fs.readFile(path.join(dest, name))
+  t.is(content.toString(), expect_content, 'wrong content: ${dest}')
+}
+
+
+function s (o) {
+  o.render = mustache.render
+  return new Scaffold(o)
+}
+
+
+function tmp () {
+  return new Promise((resolve, reject) => {
+    _tmp.dir((err, path) => {
+      if (err) {
+        return reject(err)
       }
 
-    }).copy(from, to, function (err) {
-      expect_file(to, expected, 'package.json')
-
-      // no change
-      expect( fs.read(node_path.join(to, 'lib/index.js')) ).to.equal('abc')
-      expect(err).to.equal(null)
-
-      // .dot file
-      expect( fs.exists(to, '.gitignore') ).to.equal(true)
-      done()
+      resolve(path)
     })
   })
+}
 
-  it(".copy(from, to, callback), override=true", function(done){
-    var to = tmp.make(fixtures)
-    var from = node_path.join(fixtures, 'template')
-    fs.write( node_path.join(to, 'lib/index.js'), 'abc')
 
-    scaffold({
-      data: {
-        name: 'cortex',
-        main: 'lib/index.js'
-      },
-      override: true
+const data = {
+  name: 'foo',
+  main: 'index.js'
+}
 
-    }).copy(from, to, function (err) {
-      expect_file(to, expected, 'package.json')
-      expect_file(to, expected, 'lib/index.js', 'index.js')
-      expect(fs.exists(to, 'lib/index.js.bak')).to.equal(true)
-      expect(err).to.equal(null)
-      done()
-    })
+test('copy, override=false, not exists', async t => {
+  const to = await tmp()
+  await s({
+    data
   })
+  .copy(template(), to)
 
-  it(".copy(from, to, callback), ignore", function(done){
-    var to = tmp.make(fixtures)
-    var from = node_path.join(fixtures, 'template')
-    fs.write( node_path.join(to, 'lib/index.js'), 'abc')
+  await equal(t, to, 'index.js')
+  await equal(t, to, 'package.json')
+})
 
-    scaffold({
-      data: {
-        name: 'cortex',
-        main: 'lib/index.js'
-      },
-      ignore: ['.gitignore']
 
-    }).copy(from, to, function (err) {
-      expect_file(to, expected, 'package.json')
+test('copy, override=false, exists', async t => {
+  const to = await tmp()
+  await fs.writeFile(path.join(to, 'index.js'), 'a')
 
-      // no change
-      expect( fs.read(node_path.join(to, 'lib/index.js')) ).to.equal('abc')
-      expect(err).to.equal(null)
-
-      // ignored file
-      expect( fs.exists(to, '.gitignore') ).to.equal(false)
-      done()
-    })
+  await s({
+    data,
+    override: false
   })
+  .copy(template(), to)
 
-  it(".copy(from, to, callback), override=true, noBackup=true", function(done){
-    var to = tmp.make(fixtures)
-    var from = node_path.join(fixtures, 'template')
-    fs.write( node_path.join(to, 'lib/index.js'), 'abc')
+  await notEqual(t, to, 'index.js')
+  await expect(t, to, 'index.js', 'a')
+  await equal(t, to, 'package.json')
+})
 
-    scaffold({
-      data: {
-        name: 'cortex',
-        main: 'lib/index.js'
-      },
-      override: true,
-      noBackup: true
 
-    }).copy(from, to, function (err) {
-      expect_file(to, expected, 'package.json')
-      expect_file(to, expected, 'lib/index.js', 'index.js')
-      expect(fs.exists(to, 'lib/index.js.bak')).to.equal(false)
-      expect(err).to.equal(null)
-      done()
-    })
+test('copy, override=true, backup=true, exists', async t => {
+  const to = await tmp()
+  await fs.writeFile(path.join(to, 'index.js'), 'a')
+
+  await s({
+    data,
+    override: true
   })
+  .copy(template(), to)
 
-  it(".copy(map, mcallback), override=false", function(done){
-    var to = tmp.make(fixtures)
-    var from = node_path.join(fixtures, 'template')
-    fs.write( node_path.join(to, 'lib/index.js'), 'abc')
+  await equal(t, to, 'index.js')
+  await expect(t, to, 'index.js.bak', 'a')
+  await equal(t, to, 'package.json')
+})
 
-    var map = {}
-    map[ node_path.join(from, '{%=main%}') ] = node_path.join(to, 'lib/index.js')
-    map[ node_path.join(from, 'package.json') ] = node_path.join(to, 'package.json')
 
-    scaffold({
-      data: {
-        name: 'cortex',
-        main: 'lib/index.js'
-      }
+test('copy, override=true, backup=false, exists', async t => {
+  const to = await tmp()
+  await fs.writeFile(path.join(to, 'index.js'), 'a')
 
-    }).copy(map, function (err) {
-      expect_file(to, expected, 'package.json')
-
-      // no change
-      expect( fs.read(node_path.join(to, 'lib/index.js')) ).to.equal('abc')
-      expect(err).to.equal(null)
-      done()
-    })
+  await s({
+    data,
+    override: true,
+    backup: false
   })
+  .copy(template(), to)
 
-  it(".copy(map, mcallback), override=true", function(done){
-    var to = tmp.make(fixtures)
-    var from = node_path.join(fixtures, 'template')
-    fs.write( node_path.join(to, 'lib/index.js'), 'abc')
+  await equal(t, to, 'index.js')
+  await equal(t, to, 'package.json')
 
-    var map = {}
-    map[ node_path.join(from, '{%=main%}') ] = node_path.join(to, 'lib/index.js')
-    map[ node_path.join(from, 'package.json') ] = node_path.join(to, 'package.json')
-
-    scaffold({
-      data: {
-        name: 'cortex',
-        main: 'lib/index.js'
-      },
-      override: true
-
-    }).copy(map, function (err) {
-      expect_file(to, expected, 'package.json')
-      expect_file(to, expected, 'lib/index.js', 'index.js')
-      expect(err).to.equal(null)
-      done()
-    })
-  })
-
-  it(".copy(file, file, callback), override=false", function(done){
-    var to = tmp.make(fixtures)
-    var from = node_path.join(fixtures, 'template', 'package.json')
-    var file_to = node_path.join(to, 'package.json')
-
-    scaffold({
-      data: {
-        name: 'cortex',
-        main: 'lib/index.js'
-      }
-
-    }).copy(from, file_to, function (err) {
-      expect_file(to, expected, 'package.json')
-      expect(err).to.equal(null)
-      done()
-    })
-  })
-
-  it(".copy(file, dir, callback), override=false", function(done){
-    var to = tmp.make(fixtures)
-    var from = node_path.join(fixtures, 'template', 'package.json')
-
-    scaffold({
-      data: {
-        name: 'cortex',
-        main: 'lib/index.js'
-      }
-
-    }).copy(from, to, function (err) {
-      expect_file(to, expected, 'package.json')
-      expect(err).to.equal(null)
-      done()
-    })
-  })
-
-  it(".write(to, template, callback)", function(done){
-    var tmp_dir = tmp.make(fixtures)
-    var base = '{%=name%}'
-    var to = node_path.join(tmp_dir, base)
-
-    scaffold({
-      data: {
-        name: 'abc.js',
-        blah: 'blah'
-      }
-    }).write(to, '{%=blah%}', function () {
-      var real_to = node_path.join(tmp_dir, 'abc.js')
-      expect( fs.exists(real_to) ).to.equal(true)
-      expect( fs.read(real_to) ).to.equal('blah')
-      done()
-    })
-  })
+  const dest = path.join(to, 'index.js.bak')
+  const exists = await fs.exists(dest)
+  t.is(exists, false, 'should not backup')
 })

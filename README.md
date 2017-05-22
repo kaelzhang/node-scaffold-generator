@@ -1,12 +1,11 @@
 [![NPM version](https://badge.fury.io/js/scaffold-generator.svg)](http://badge.fury.io/js/scaffold-generator)
 [![Build Status](https://travis-ci.org/kaelzhang/node-scaffold-generator.svg?branch=master)](https://travis-ci.org/kaelzhang/node-scaffold-generator)
-[![Dependency Status](https://gemnasium.com/kaelzhang/node-scaffold-generator.svg)](https://gemnasium.com/kaelzhang/node-scaffold-generator)
 
 # scaffold-generator
 
 Scaffold-generator is a scaffolding utility used to automate project creation from the specified template and data.
 
-Scaffold-generator could be the core utility to create something like grunt-init and [cortex](https://github.com/cortexjs/cortex)-init.
+Scaffold-generator could be the core utility to create something like grunt-init and your yeoman generators.
 
 `rename.json` of grunt-init is silly and scaffold-generator use template engine for both file content and file name.
 
@@ -38,10 +37,10 @@ And /path/from/package.json:
 ```
 
 ```js
-const scaffold = require('scaffold-generator')
+const Scaffold = require('scaffold-generator')
 const mustache = require('mustache')
 
-scaffold({
+new Scaffold({
   data: {
     name: 'my-module',
     main: 'lib/index.js'
@@ -72,7 +71,7 @@ And /path/to/package.json
 }
 ```
 
-## scaffold(options)
+## new Scaffold(options)
 
 - **options** `Object`
   - **data** `Object` the data which will be substituted into the template file.
@@ -109,7 +108,7 @@ Will try to write to `dest_file` with the substituted content of `src_file`
 Will try to copy `src_file` into `dest_dir`
 
 
-### .write(to, template);
+### .write(to, template)
 
 Writes file `to` with rendered `template` if `options.override` is `true`.
 

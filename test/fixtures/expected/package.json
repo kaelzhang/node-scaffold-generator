@@ -1,4 +1,4 @@
 {
-  "name": "cortex",
-  "main": "lib/index.js"
+  "name": "foo",
+  "main": "index.js"
 }

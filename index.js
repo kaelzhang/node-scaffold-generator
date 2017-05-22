@@ -8,7 +8,7 @@ const {
 
 const REGEX_IS_GLOB_FILE = /[^\/]$/
 
-module.exports = class scaffold {
+module.exports = class Scaffold {
   constructor ({
     render,
     override = true,
@@ -46,7 +46,8 @@ module.exports = class scaffold {
     .then(
       stat => {
         if (stat.isDirectory()) {
-          const name = path.basename(from)
+          // Only substitute path when `to` is not explicitly specified.
+          const name = this._to(path.basename(from))
           to = path.join(to, name)
         }
 
@@ -55,16 +56,18 @@ module.exports = class scaffold {
 
       () => this._copyFile(from, to)
     )
-  }†
+  }
 
   async _copyDir (from, to) {
     const files = await this._globDir(from)
     const map = {}
 
-    files.forEach(function (file) {
+    files.forEach(file => {
       const file_from = path.join(from, file)
       const file_to = path.join(to, file)
-      map[file_from] = file_to
+
+      // Only substitute path when `to` is not explicitly specified.
+      map[file_from] = this._to(file_to)
     })
 
     return this._copyFiles(map)
@@ -88,7 +91,7 @@ module.exports = class scaffold {
 
   _copyFiles (map) {
     const tasks = Object.keys(map).map(from => {
-      const to = map(from)
+      const to = map[from]
       return this._copyFile(from, to)
     })
 
@@ -97,26 +100,21 @@ module.exports = class scaffold {
 
   // Substitute filename
   _to (to) {
-    const {
-      render,
-      data
-    } = this._options
+    return this._render(to, this._data)
+  }
 
-    return render(to, data)
+  async _readAndTemplate (path) {
+    const content = await fs.readFile(path)
+    return this._render(content.toString(), this._data)
   }
 
   async write (to, template) {
-    const {
-      render,
-      data
-    } = this.options
-
     const override = await this._shouldOverride(to)
     if (!override) {
       return
     }
 
-    const content = render(template, data)
+    const content = this._render(template, this._data)
     return fs.outputFile(to, content)
   }
 
@@ -126,7 +124,7 @@ module.exports = class scaffold {
       return
     }
 
-    const content = await this._readAndTemplate(from, data)
+    const content = await this._readAndTemplate(from)
     const stat = await fs.stat(from)
     return fs.outputFile(to, content, {
       mode: stat.mode
@@ -138,7 +136,7 @@ module.exports = class scaffold {
     const backup = this._backup
 
     return fs.exists(file)
-    then(exists => {
+    .then(exists => {
       // File not exists
       if (!exists) {
         return true
@@ -158,11 +156,5 @@ module.exports = class scaffold {
       return fs.copy(file, backFile)
       .then(() => true)
     })
-  }
-
-  async _readAndTemplate (path, data, callback) {
-    var render = this.options.renderer
-    const content = await fs.readFile(path)
-    return this.options.render(content.toString(), data)
   }
 }
