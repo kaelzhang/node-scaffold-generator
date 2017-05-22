@@ -95,7 +95,8 @@ module.exports = function () {
               case 5:
                 return _context.abrupt('return', fs.stat(to).then(function (stat) {
                   if (stat.isDirectory()) {
-                    var name = path.basename(from);
+                    // Only substitute path when `to` is not explicitly specified.
+                    var name = _this._to(path.basename(from));
                     to = path.join(to, name);
                   }
 
@@ -122,6 +123,8 @@ module.exports = function () {
     key: '_copyDir',
     value: function () {
       var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(from, to) {
+        var _this2 = this;
+
         var files, map;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
           while (1) {
@@ -138,7 +141,9 @@ module.exports = function () {
                 files.forEach(function (file) {
                   var file_from = path.join(from, file);
                   var file_to = path.join(to, file);
-                  map[file_from] = file_to;
+
+                  // Only substitute path when `to` is not explicitly specified.
+                  map[file_from] = _this2._to(file_to);
                 });
 
                 return _context2.abrupt('return', this._copyFiles(map));
@@ -202,11 +207,11 @@ module.exports = function () {
   }, {
     key: '_copyFiles',
     value: function _copyFiles(map) {
-      var _this2 = this;
+      var _this3 = this;
 
       var tasks = (0, _keys2.default)(map).map(function (from) {
-        var to = map(from);
-        return _this2._copyFile(from, to);
+        var to = map[from];
+        return _this3._copyFile(from, to);
       });
 
       return _promise2.default.all(tasks);
@@ -217,42 +222,25 @@ module.exports = function () {
   }, {
     key: '_to',
     value: function _to(to) {
-      var _options = this._options,
-          render = _options.render,
-          data = _options.data;
-
-
-      return render(to, data);
+      return this._render(to, this._data);
     }
   }, {
-    key: 'write',
+    key: '_readAndTemplate',
     value: function () {
-      var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(to, template) {
-        var _options2, render, data, override, content;
-
+      var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(path) {
+        var content;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _options2 = this.options, render = _options2.render, data = _options2.data;
-                _context4.next = 3;
-                return this._shouldOverride(to);
+                _context4.next = 2;
+                return fs.readFile(path);
 
-              case 3:
-                override = _context4.sent;
+              case 2:
+                content = _context4.sent;
+                return _context4.abrupt('return', this._render(content.toString(), this._data));
 
-                if (override) {
-                  _context4.next = 6;
-                  break;
-                }
-
-                return _context4.abrupt('return');
-
-              case 6:
-                content = render(template, data);
-                return _context4.abrupt('return', fs.outputFile(to, content));
-
-              case 8:
+              case 4:
               case 'end':
                 return _context4.stop();
             }
@@ -260,17 +248,17 @@ module.exports = function () {
         }, _callee4, this);
       }));
 
-      function write(_x7, _x8) {
+      function _readAndTemplate(_x7) {
         return _ref5.apply(this, arguments);
       }
 
-      return write;
+      return _readAndTemplate;
     }()
   }, {
-    key: '_copyFile',
+    key: 'write',
     value: function () {
-      var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(from, to) {
-        var override, content, stat;
+      var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(to, template) {
+        var override, content;
         return _regenerator2.default.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -289,21 +277,10 @@ module.exports = function () {
                 return _context5.abrupt('return');
 
               case 5:
-                _context5.next = 7;
-                return this._readAndTemplate(from, data);
+                content = this._render(template, this._data);
+                return _context5.abrupt('return', fs.outputFile(to, content));
 
               case 7:
-                content = _context5.sent;
-                _context5.next = 10;
-                return fs.stat(from);
-
-              case 10:
-                stat = _context5.sent;
-                return _context5.abrupt('return', fs.outputFile(to, content, {
-                  mode: stat.mode
-                }));
-
-              case 12:
               case 'end':
                 return _context5.stop();
             }
@@ -311,8 +288,59 @@ module.exports = function () {
         }, _callee5, this);
       }));
 
-      function _copyFile(_x9, _x10) {
+      function write(_x8, _x9) {
         return _ref6.apply(this, arguments);
+      }
+
+      return write;
+    }()
+  }, {
+    key: '_copyFile',
+    value: function () {
+      var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(from, to) {
+        var override, content, stat;
+        return _regenerator2.default.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return this._shouldOverride(to);
+
+              case 2:
+                override = _context6.sent;
+
+                if (override) {
+                  _context6.next = 5;
+                  break;
+                }
+
+                return _context6.abrupt('return');
+
+              case 5:
+                _context6.next = 7;
+                return this._readAndTemplate(from);
+
+              case 7:
+                content = _context6.sent;
+                _context6.next = 10;
+                return fs.stat(from);
+
+              case 10:
+                stat = _context6.sent;
+                return _context6.abrupt('return', fs.outputFile(to, content, {
+                  mode: stat.mode
+                }));
+
+              case 12:
+              case 'end':
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function _copyFile(_x10, _x11) {
+        return _ref7.apply(this, arguments);
       }
 
       return _copyFile;
@@ -323,8 +351,7 @@ module.exports = function () {
       var override = this._override;
       var backup = this._backup;
 
-      return fs.exists(file);
-      then(function (exists) {
+      return fs.exists(file).then(function (exists) {
         // File not exists
         if (!exists) {
           return true;
@@ -346,37 +373,6 @@ module.exports = function () {
         });
       });
     }
-  }, {
-    key: '_readAndTemplate',
-    value: function () {
-      var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(path, data, callback) {
-        var render, content;
-        return _regenerator2.default.wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                render = this.options.renderer;
-                _context6.next = 3;
-                return fs.readFile(path);
-
-              case 3:
-                content = _context6.sent;
-                return _context6.abrupt('return', this.options.render(content.toString(), data));
-
-              case 5:
-              case 'end':
-                return _context6.stop();
-            }
-          }
-        }, _callee6, this);
-      }));
-
-      function _readAndTemplate(_x11, _x12, _x13) {
-        return _ref7.apply(this, arguments);
-      }
-
-      return _readAndTemplate;
-    }()
   }]);
   return Scaffold;
 }();
