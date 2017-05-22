@@ -24,7 +24,7 @@ Suppose the file structure is:
 
 ```
 /path/from
-         |-- {%=main%} // default to ejs template
+         |-- {{main}} // default to ejs template
          |-- package.json
 ```
 
@@ -32,21 +32,26 @@ And /path/from/package.json:
 
 ```json
 {
-  "name": "{%= name %}",
-  "main": "{%= main %}"
+  "name": "{{name}}",
+  "main": "{{main}}"
 }
 ```
 
 ```js
-var scaffold = require('scaffold-generator');
+const scaffold = require('scaffold-generator')
+const mustache = require('mustache')
+
 scaffold({
   data: {
-    name: 'cortex',
+    name: 'my-module',
     main: 'lib/index.js'
-  }
-}).copy('/path/from', '/path/to', function(err){
-  // suppose `err` is null
-});
+  },
+  render: mustache.render
+})
+.copy('/path/from', '/path/to')
+.then(() => {
+  console.log('done')
+})
 ```
 
 Then,
@@ -62,64 +67,49 @@ And /path/to/package.json
 
 ```json
 {
-  "name": "cortex",
+  "name": "my-module",
   "main": "lib/index.js"
 }
 ```
 
-
 ## scaffold(options)
 
-- options `Object` 
-    - data `Object` the data which will be substituted into the template file.
-    - ignore `String|String[]` the ignore rule or a array of rules.
-    - renderer `Object=ejs` the renderer to compile the template and apply data. The default renderer is [`ejs`](http://www.npmjs.org/package/ejs) created by TJ.
-    - override `Boolean=false` whether should override existing files
-    - noBackup `Boolean=false` if noBackup is `false`, a `.bak` file will be saved when overriding an existing file.
-    - noCheckTag `Boolean=false` if `true`, it will not check the cross-platform compatibility, such as Windows.
-    - open `String='{%'` the open tag for `ejs`, default to `'{%'`
-    - close `String='%}'` the close tag, default to `'%}'`
+- **options** `Object`
+  - **data** `Object` the data which will be substituted into the template file.
+  - **ignore** `(String|Array.<String>|Ignore)=` the ignore rule or a array of rules.
+  - **render** `function(str, data): String` the renderer to compile the template and apply data.
+  - **override** `Boolean=false` whether should override existing files
+  - **backup** `Boolean=true` if `backup:true`, a `.bak` file will be saved when overriding an existing file.
 
 Creates an instance of scaffold-generator
 
-### .generate(fileMap, callback)
+### .copy(from, to)
+### .copy(fileMap)
 
-- fileMap `Object` the hashmap of `<from>: <to>`. See the example above for details to get a better understanding.
-- callback `function(err)`
-- err `Error`
-
-Generates the scaffold.
-
-Scaffold-generator never cares file renaming which you could deal with ahead of time.
-
-### .copy(from, to, callback)
-### .copy(file_map, callback)
-
-- from `path` see ['cases'](#cases) section
-- to `path` see ['cases'](#cases) section
-- file_map `Object` the `{from: to}` object
-- callback `function(err)`
-- err `Error`
+- **from** `path` see ['cases'](#cases) section
+- **to** `path` see ['cases'](#cases) section
+- **fileMap** `Object` the `{from: to}` object
 
 This method will still substitute the content and the pathname of template files with `options.data`.
 
+Returns `Promise`
 
 #### Cases
 
-##### .copy(src_dir, dest_dir, callback)
+##### .copy(src_dir, dest_dir)
 
 Will try to copy all contents of `src_dir`(not `src_dir` itself) to `dest_dir`
 
-##### .copy(src_file, dest_file, callback)
+##### .copy(src_file, dest_file)
 
 Will try to write to `dest_file` with the substituted content of `src_file`
 
-##### .copy(src_file, dest_dir, callback)
+##### .copy(src_file, dest_dir)
 
 Will try to copy `src_file` into `dest_dir`
 
 
-### .write(to, template, callback);
+### .write(to, template);
 
-Writes file `to` with rendered `template` if `options.override` is `true`. 
+Writes file `to` with rendered `template` if `options.override` is `true`.
 

@@ -1,14 +1,12 @@
-'use strict'
+const test = require('ava')
+const scaffold = require('../')
+const fs = require('fs-extra')
+const mustache = require('mustache')
+const path = require('path')
 
-var expect = require('chai').expect
-var scaffold = require('../')
-var fs = require('fs-sync')
-var node_path = require('path')
-var tmp = require('tmp-sync')
-var ejs = require('package')
+const fixtures = (filepath = '') => path.join(__dirname, 'fixtures', filepath)
+const expected = (filepath = '') => path.join(__dirname, 'expected', filepath)
 
-var fixtures = node_path.join(__dirname, 'fixtures')
-var expected = node_path.join(fixtures, 'expected')
 
 function expect_file (to, expected, name, expect_name) {
   var content = fs.read( node_path.join(to, name) )

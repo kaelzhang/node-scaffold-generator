@@ -1,7 +1,9 @@
 const assert = require('assert')
-const fs = require('fs-promise')
+const fs = require('fs-extra')
 const path = require('path')
-const glob = require('globby')
+const {
+  glob
+} = require('glob-gitignore')
 
 
 const REGEX_IS_GLOB_FILE = /[^\/]$/
@@ -11,17 +13,19 @@ module.exports = class scaffold {
     render,
     override = true,
     backup = true,
-    data
+    data,
+    ignore
   } = {}) {
 
     assert(render && typeof render === 'function',
       'options.render must be a function.')
-    assert(Object(data) === data, 'options.data must be a function.')
+    assert(Object(data) === data, 'options.data must be an object.')
 
     this._render = render
     this._override = override
-    this._backup = backup,
+    this._backup = backup
     this._data = data
+    this._ignore = ignore
   }
 
   copy (from, to) {
@@ -51,7 +55,7 @@ module.exports = class scaffold {
 
       () => this._copyFile(from, to)
     )
-  }
+  }†
 
   async _copyDir (from, to) {
     const files = await this._globDir(from)
@@ -67,14 +71,18 @@ module.exports = class scaffold {
   }
 
   async _globDir (root) {
-    const files = await glob('**/*', {
+    const options = {
       cwd: root,
       dot: true,
-      ignore: this.options.ignore,
       // Then, the dirs in `files` will end with a slash `/`
       mark: true
-    })
+    }
 
+    if (this._ignore) {
+      options.ignore = this._ignore
+    }
+
+    const files = await glob('**/*', options)
     return files.filter(REGEX_IS_GLOB_FILE.test, REGEX_IS_GLOB_FILE)
   }
 
@@ -131,30 +139,24 @@ module.exports = class scaffold {
 
     return fs.exists(file)
     then(exists => {
-
-    })
-
-
-    , function (exists) {
-      if (exists) {
-        if (override) {
-          if (!noBackup) {
-            var bak_file = file + '.bak'
-            // Save a '.bak' file
-            return fse.copy(file, bak_file, function () {
-              callback(true)
-            })
-
-          } else {
-            return callback(true)
-          }
-
-        } else {
-          return callback(false)
-        }
+      // File not exists
+      if (!exists) {
+        return true
       }
 
-      callback(true)
+      // Exists, and not override
+      if (!override) {
+        return false
+      }
+
+      // Exists, override, and need not to create backup
+      if (!backup) {
+        return true
+      }
+
+      const backFile = file + '.bak'
+      return fs.copy(file, backFile)
+      .then(() => true)
     })
   }
 
