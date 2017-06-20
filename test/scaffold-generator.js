@@ -77,7 +77,7 @@ test('copy, override=false, not exists', async t => {
   await equal(t, to, 'package.json')
 })
 
-test.only('copy, override=false, not exists, hierachical dirs', async t => {
+test('copy, override=false, not exists, hierachical dirs', async t => {
   const to = await tmp()
   await s({
     data: {

@@ -1,6 +1,6 @@
 {
   "name": "scaffold-generator",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Generates a repo from a specified template and data.",
   "main": "scaffold.js",
   "scripts": {
@@ -53,6 +53,7 @@
     "tmp": "^0.0.31"
   },
   "dependencies": {
+    "babel-runtime": "^6.23.0",
     "fs-extra": "^3.0.1",
     "glob-gitignore": "^1.0.4"
   }

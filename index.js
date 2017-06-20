@@ -4,11 +4,12 @@ const path = require('path')
 const {
   glob
 } = require('glob-gitignore')
+const { EventEmitter } = require('events')
 
 
 const REGEX_IS_GLOB_FILE = /[^\/]$/
 
-module.exports = class Scaffold {
+module.exports = class Scaffold extends EventEmitter {
   constructor ({
     render,
     override = true,
@@ -16,6 +17,7 @@ module.exports = class Scaffold {
     data,
     ignore
   } = {}) {
+    super()
 
     assert(render && typeof render === 'function',
       'options.render must be a function.')

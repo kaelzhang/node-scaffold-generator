@@ -16,6 +16,10 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
+var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -23,6 +27,14 @@ var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = require('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = require('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -33,9 +45,14 @@ var path = require('path');
 var _require = require('glob-gitignore'),
     glob = _require.glob;
 
+var _require2 = require('events'),
+    EventEmitter = _require2.EventEmitter;
+
 var REGEX_IS_GLOB_FILE = /[^\/]$/;
 
-module.exports = function () {
+module.exports = function (_EventEmitter) {
+  (0, _inherits3.default)(Scaffold, _EventEmitter);
+
   function Scaffold() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         render = _ref.render,
@@ -48,15 +65,17 @@ module.exports = function () {
 
     (0, _classCallCheck3.default)(this, Scaffold);
 
+    var _this = (0, _possibleConstructorReturn3.default)(this, (Scaffold.__proto__ || (0, _getPrototypeOf2.default)(Scaffold)).call(this));
 
     assert(render && typeof render === 'function', 'options.render must be a function.');
     assert(Object(data) === data, 'options.data must be an object.');
 
-    this._render = render;
-    this._override = override;
-    this._backup = backup;
-    this._data = data;
-    this._ignore = ignore;
+    _this._render = render;
+    _this._override = override;
+    _this._backup = backup;
+    _this._data = data;
+    _this._ignore = ignore;
+    return _this;
   }
 
   (0, _createClass3.default)(Scaffold, [{
@@ -72,7 +91,7 @@ module.exports = function () {
     key: '_copy',
     value: function () {
       var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(from, to) {
-        var _this = this;
+        var _this2 = this;
 
         var stat;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -96,13 +115,13 @@ module.exports = function () {
                 return _context.abrupt('return', fs.stat(to).then(function (stat) {
                   if (stat.isDirectory()) {
                     // Only substitute path when `to` is not explicitly specified.
-                    var name = _this._to(path.basename(from));
+                    var name = _this2._to(path.basename(from));
                     to = path.join(to, name);
                   }
 
-                  return _this._copyFile(from, to);
+                  return _this2._copyFile(from, to);
                 }, function () {
-                  return _this._copyFile(from, to);
+                  return _this2._copyFile(from, to);
                 }));
 
               case 6:
@@ -123,7 +142,7 @@ module.exports = function () {
     key: '_copyDir',
     value: function () {
       var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(from, to) {
-        var _this2 = this;
+        var _this3 = this;
 
         var files, map;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -143,7 +162,7 @@ module.exports = function () {
                   var file_to = path.join(to, file);
 
                   // Only substitute path when `to` is not explicitly specified.
-                  map[file_from] = _this2._to(file_to);
+                  map[file_from] = _this3._to(file_to);
                 });
 
                 return _context2.abrupt('return', this._copyFiles(map));
@@ -207,11 +226,11 @@ module.exports = function () {
   }, {
     key: '_copyFiles',
     value: function _copyFiles(map) {
-      var _this3 = this;
+      var _this4 = this;
 
       var tasks = (0, _keys2.default)(map).map(function (from) {
         var to = map[from];
-        return _this3._copyFile(from, to);
+        return _this4._copyFile(from, to);
       });
 
       return _promise2.default.all(tasks);
@@ -375,4 +394,4 @@ module.exports = function () {
     }
   }]);
   return Scaffold;
-}();
+}(EventEmitter);
