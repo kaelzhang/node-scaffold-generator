@@ -1,5 +1,5 @@
-[![NPM version](https://badge.fury.io/js/scaffold-generator.svg)](http://badge.fury.io/js/scaffold-generator)
 [![Build Status](https://travis-ci.org/kaelzhang/node-scaffold-generator.svg?branch=master)](https://travis-ci.org/kaelzhang/node-scaffold-generator)
+[![Coverage](https://codecov.io/gh/kaelzhang/node-scaffold-generator/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/node-scaffold-generator)
 
 # scaffold-generator
 
