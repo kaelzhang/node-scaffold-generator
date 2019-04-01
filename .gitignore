@@ -1,4 +1,5 @@
-test/fixtures/to/
+# babel dist
+/lib
 
 # Numerous always-ignore extensions
 *.bak
@@ -15,6 +16,13 @@ test/fixtures/to/
 *~
 *.sass-cache
 *.lock
+*.rdb
+*.db
+nohup.out
+.nyc_output
+coverage.lcov
+package-lock.json
+*.tgz
 
 # OS or Editor folders
 .DS_Store
@@ -24,8 +32,8 @@ test/fixtures/to/
 .settings
 .tmproj
 *.esproj
-*.sublime-project
-*.sublime-workspace
+*.*-project
+*.*-workspace
 nbproject
 thumbs.db
 
@@ -38,10 +46,21 @@ node_modules
 old/
 *-old/
 *-notrack/
+no-track/
 build/
 combo/
 reference/
 jscoverage_lib/
 temp/
+tmp/
 
+# Java
+.mvn
+.gradle
+.vscode
+.project
+.classpath
+/gradle
 
+# codecov.io
+coverage/

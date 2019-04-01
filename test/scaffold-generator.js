@@ -1,5 +1,5 @@
 const test = require('ava')
-const Scaffold = require('../index')
+const Scaffold = require('..')
 const fs = require('fs-extra')
 const mustache = require('mustache')
 const path = require('path')
