@@ -7,11 +7,11 @@ const _tmp = require('tmp')
 
 mustache.escape = v => v
 
-const template = (filepath = '') =>
-  path.join(__dirname, 'fixtures', 'template', filepath)
+const template = (...args) =>
+  path.join(__dirname, 'fixtures', 'template', ...args)
 
-const expected = (filepath = '') =>
-  path.join(__dirname, 'fixtures', 'expected', filepath)
+const expected = (...args) =>
+  path.join(__dirname, 'fixtures', 'expected', ...args)
 
 
 // @param {path} dest dest dir
@@ -30,11 +30,9 @@ async function equal (t, dest, name, dest_name, equal = true) {
   }
 }
 
-
 function notEqual (t, d, n) {
   return equal(t, d, n, undefined, false)
 }
-
 
 async function expect (t, dest, name, expect_content) {
   const content = await fs.readFile(path.join(dest, name))
@@ -60,7 +58,6 @@ function tmp () {
   })
 }
 
-
 const data = {
   name: 'foo',
   main: 'index.js'
@@ -76,9 +73,20 @@ test('copy, override=false, not exists', async t => {
 
   await equal(t, to, 'index.js')
   await equal(t, to, 'package.json')
+  await equal(t, to, 'dir/file.js')
 
   const exists = await fs.exists(path.join(to, 'DS_Store'))
   t.false(exists)
+})
+
+test('copy file to dir', async t => {
+  const to = await tmp()
+  await s({
+    data
+  })
+  .copy(template('{{main}}'), to)
+
+  await equal(t, to, 'index.js')
 })
 
 test('copy, override=false, not exists, hierachical dirs', async t => {
@@ -94,8 +102,25 @@ test('copy, override=false, not exists, hierachical dirs', async t => {
   await equal(t, to, 'index.js', 'lib/index.js')
 })
 
+test('copy files map', async t => {
+  const map = {}
+  const to = await tmp()
+  map[template('{{main}}')] = to
+  map[template('package.json')] = to
 
-test('copy, override=false, exists', async t => {
+  await s({
+    data: {
+      name: 'foo',
+      main: 'index.js'
+    }
+  })
+  .copy(map)
+
+  await equal(t, to, 'index.js')
+  await equal(t, to, 'package.json')
+})
+
+test('copy dir, override=false, exists', async t => {
   const to = await tmp()
   await fs.writeFile(path.join(to, 'index.js'), 'a')
 

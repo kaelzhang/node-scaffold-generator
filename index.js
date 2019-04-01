@@ -30,18 +30,35 @@ module.exports = class Scaffold extends EventEmitter {
     this._ignore = ignore
   }
 
+  // - from/to: we dont know whether it is a file or directory
+  // - fromDir/toDir: it is a dir
+  // - fromFile/toFile: it is a file
+
+  // We don't know
   copy (from, to) {
     if (Object(from) === from) {
-      return this._copyFiles(from)
+      return this._copyMaps(from)
     }
 
     return this._copy(from, to)
   }
 
+  _copyMaps (map) {
+    const tasks = Object.keys(map).map(from => {
+      const to = map[from]
+      return this._copy(from, to)
+    })
+
+    return Promise.all(tasks)
+  }
+
+  // We don't know whether from or to is a file or directory
   async _copy (from, to) {
     const stat = await fs.stat(from)
+
+    // If from is a directory, we suppose that `to` is a directory
     if (stat.isDirectory()) {
-      return this._copyDir(from, to)
+      return this._copyDirToDir(from, to)
     }
 
     return fs.stat(to)
@@ -52,23 +69,24 @@ module.exports = class Scaffold extends EventEmitter {
         to = path.join(to, name)
       }
 
-      return this._copyFile(from, to)
+      return this._copyFileToFile(from, to)
     })
   }
 
-  async _copyDir (from, to) {
-    const files = await this._globDir(from)
+  // Copy dir to dir
+  async _copyDirToDir (fromDir, toDir) {
+    const files = await this._globDir(fromDir)
     const map = {}
 
     files.forEach(file => {
-      const file_from = path.join(from, file)
-      const file_to = path.join(to, file)
+      const fromFile = path.join(fromDir, file)
+      const toFile = path.join(toDir, file)
 
       // Only substitute path when `to` is not explicitly specified.
-      map[file_from] = this._to(file_to)
+      map[fromFile] = this._to(toFile)
     })
 
-    return this._copyFiles(map)
+    return this._copyFilesToFiles(map)
   }
 
   async _globDir (root) {
@@ -87,10 +105,10 @@ module.exports = class Scaffold extends EventEmitter {
     return files.filter(REGEX_IS_GLOB_FILE.test, REGEX_IS_GLOB_FILE)
   }
 
-  _copyFiles (map) {
+  _copyFilesToFiles (map) {
     const tasks = Object.keys(map).map(from => {
       const to = map[from]
-      return this._copyFile(from, to)
+      return this._copyFileToFile(from, to)
     })
 
     return Promise.all(tasks)
@@ -116,15 +134,15 @@ module.exports = class Scaffold extends EventEmitter {
     return fs.outputFile(to, content)
   }
 
-  async _copyFile (from, to) {
-    const override = await this._shouldOverride(to)
+  async _copyFileToFile (fromFile, toFile) {
+    const override = await this._shouldOverride(toFile)
     if (!override) {
       return
     }
 
-    const content = await this._readAndTemplate(from)
-    const stat = await fs.stat(from)
-    return fs.outputFile(to, content, {
+    const content = await this._readAndTemplate(fromFile)
+    const stat = await fs.stat(fromFile)
+    return fs.outputFile(toFile, content, {
       mode: stat.mode
     })
   }
