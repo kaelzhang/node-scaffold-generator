@@ -45,19 +45,15 @@ module.exports = class Scaffold extends EventEmitter {
     }
 
     return fs.stat(to)
-    .then(
-      stat => {
-        if (stat.isDirectory()) {
-          // Only substitute path when `to` is not explicitly specified.
-          const name = this._to(path.basename(from))
-          to = path.join(to, name)
-        }
+    .then(stat => {
+      if (stat.isDirectory()) {
+        // Only substitute path when `to` is not explicitly specified.
+        const name = this._to(path.basename(from))
+        to = path.join(to, name)
+      }
 
-        return this._copyFile(from, to)
-      },
-
-      () => this._copyFile(from, to)
-    )
+      return this._copyFile(from, to)
+    })
   }
 
   async _copyDir (from, to) {

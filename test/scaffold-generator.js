@@ -69,12 +69,16 @@ const data = {
 test('copy, override=false, not exists', async t => {
   const to = await tmp()
   await s({
-    data
+    data,
+    ignore: ['DS_Store']
   })
   .copy(template(), to)
 
   await equal(t, to, 'index.js')
   await equal(t, to, 'package.json')
+
+  const exists = await fs.exists(path.join(to, 'DS_Store'))
+  t.false(exists)
 })
 
 test('copy, override=false, not exists, hierachical dirs', async t => {
@@ -140,4 +144,42 @@ test('copy, override=true, backup=false, exists', async t => {
   const dest = path.join(to, 'index.js.bak')
   const exists = await fs.exists(dest)
   t.is(exists, false, 'should not backup')
+})
+
+test('write, normal', async t => {
+  const to = await tmp()
+
+  await s({
+    data
+  })
+  .write(path.join(to, 'write.js'), '// {{name}}\n')
+
+  await equal(t, to, 'write.js')
+})
+
+test('write, override=true, backup=true', async t => {
+  const to = await tmp()
+  await fs.writeFile(path.join(to, 'write.js'), 'a')
+
+  await s({
+    data
+  })
+  .write(path.join(to, 'write.js'), '// {{name}}\n')
+
+  await equal(t, to, 'write.js')
+})
+
+test('write, override=false', async t => {
+  const to = await tmp()
+  const filepath = path.join(to, 'write.js')
+  await fs.writeFile(filepath, 'a')
+
+  await s({
+    data,
+    override: false
+  })
+  .write(filepath, '// {{name}}\n')
+
+  const content = await fs.readFile(filepath)
+  t.is(content.toString(), 'a')
 })
