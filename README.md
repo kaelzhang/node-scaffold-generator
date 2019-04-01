@@ -86,38 +86,37 @@ File contents will also be substitute. And the file `/path/to/package.json` will
   - **data** `Object` the data which will be substituted into the template file.
   - **ignore** `(String|Array.<String>|Ignore)=` the ignore rule or a array of rules.
   - **render** `function(str, data): String` the renderer to compile the template and apply data.
-  - **override** `Boolean=false` whether should override existing files
+  - **override** `Boolean=true` whether should override existing files
   - **backup** `Boolean=true` if `backup:true`, a `.bak` file will be saved when overriding an existing file.
 
 Creates an instance of scaffold-generator
 
 ### .copy(from, to)
-### .copy(fileMap)
+### .copy(filesMap)
 
 - **from** `path` see ['cases'](#cases) section
 - **to** `path` see ['cases'](#cases) section
-- **fileMap** `Object` the `{from: to}` object
+- **filesMap** `Object` the `{from: to}` object
 
 This method will still substitute the content and the pathname of template files with `options.data`.
 
 Returns `Promise`
 
-#### Cases
-
-##### .copy(src_dir, dest_dir)
-
-Will try to copy all contents of `src_dir`(not `src_dir` itself) to `dest_dir`
-
-##### .copy(src_file, dest_file)
-
-Will try to write to `dest_file` with the substituted content of `src_file`
-
-##### .copy(src_file, dest_dir)
-
-Will try to copy `src_file` into `dest_dir`
-
-
 ### .write(to, template)
 
 Writes file `to` with rendered `template` if `options.override` is `true`.
+
+## Cases
+
+### .copy(fromDir, toDir)
+
+Will try to copy all files inside `fromDir`(not `fromDir` itself) to `toDir`, with the filenames and file contents substituted.
+
+### .copy(fromFile, toFile)
+
+Will try to write to `fromFile` with the substituted content of `toFile`
+
+### .copy(fromFile, toDir)
+
+Will try to copy file `fromFile` into directory `toDir`
 
