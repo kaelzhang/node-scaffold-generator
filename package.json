@@ -1,11 +1,14 @@
 {
   "name": "scaffold-generator",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Generates a repo from a specified template and data.",
   "main": "index.js",
   "scripts": {
     "test": "nyc ava --verbose --timeout=10s"
   },
+  "files": [
+    "index.js"
+  ],
   "keywords": [
     "scaffold",
     "copy",
