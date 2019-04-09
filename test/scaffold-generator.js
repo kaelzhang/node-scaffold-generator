@@ -89,6 +89,29 @@ test('copy file to dir', async t => {
   await equal(t, to, 'index.js')
 })
 
+test('copy file to file, not exists', async t => {
+  const to = await tmp()
+  await s({
+    data
+  })
+  .copy(template('{{main}}'), path.join(to, 'index.js'))
+
+  await equal(t, to, 'index.js')
+})
+
+test('copy file to file, exists', async t => {
+  const to = await tmp()
+  const toFile = path.join(to, 'index.js')
+  await fs.outputFile(toFile, 'a')
+
+  await s({
+    data
+  })
+  .copy(template('{{main}}'), toFile)
+
+  await equal(t, to, 'index.js')
+})
+
 test('copy, override=false, not exists, hierachical dirs', async t => {
   const to = await tmp()
   await s({
@@ -207,4 +230,10 @@ test('write, override=false', async t => {
 
   const content = await fs.readFile(filepath)
   t.is(content.toString(), 'a')
+})
+
+test('TypeError', t => {
+  t.throws(() => new Scaffold())
+  t.throws(() => new Scaffold({}))
+  t.throws(() => new Scaffold({render () {}}))
 })

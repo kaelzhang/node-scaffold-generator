@@ -1,6 +1,6 @@
-const assert = require('assert')
-const fs = require('fs-extra')
 const path = require('path')
+const fs = require('fs-extra')
+const {isFunction, isObject} = require('core-util-is')
 const {
   glob
 } = require('glob-gitignore')
@@ -10,18 +10,28 @@ const { EventEmitter } = require('events')
 const REGEX_IS_GLOB_FILE = /[^\/]$/
 
 module.exports = class Scaffold extends EventEmitter {
-  constructor ({
-    render,
-    override = true,
-    backup = true,
-    data,
-    ignore
-  } = {}) {
+  constructor (options) {
     super()
 
-    assert(render && typeof render === 'function',
-      'options.render must be a function.')
-    assert(Object(data) === data, 'options.data must be an object.')
+    if (!isObject(options)) {
+      throw new TypeError('options must be an object')
+    }
+
+    const {
+      render,
+      override = true,
+      backup = true,
+      data,
+      ignore
+    } = options
+
+    if (!isFunction(render)) {
+      throw new TypeError('options.render must be a function')
+    }
+
+    if (!isObject(data)) {
+      throw new TypeError('options.data must be an object')
+    }
 
     this._render = render
     this._override = override
@@ -62,15 +72,18 @@ module.exports = class Scaffold extends EventEmitter {
     }
 
     return fs.stat(to)
-    .then(stat => {
-      if (stat.isDirectory()) {
-        // Only substitute path when `to` is not explicitly specified.
-        const name = this._to(path.basename(from))
-        to = path.join(to, name)
-      }
+    .then(
+      stat => {
+        if (stat.isDirectory()) {
+          // Copy file -> Dir
+          to = path.join(to, path.basename(from))
+        }
 
-      return this._copyFileToFile(from, to)
-    })
+        // Copy file -> file
+        return this._copyFileToFile(from, to)
+      },
+      () => this._copyFileToFile(from, to)
+    )
   }
 
   // Copy dir to dir
@@ -83,7 +96,7 @@ module.exports = class Scaffold extends EventEmitter {
       const toFile = path.join(toDir, file)
 
       // Only substitute path when `to` is not explicitly specified.
-      map[fromFile] = this._to(toFile)
+      map[fromFile] = toFile
     })
 
     return this._copyFilesToFiles(map)
@@ -134,7 +147,8 @@ module.exports = class Scaffold extends EventEmitter {
     return fs.outputFile(to, content)
   }
 
-  async _copyFileToFile (fromFile, toFile) {
+  async _copyFileToFile (fromFile, to) {
+    const toFile = this._to(to)
     const override = await this._shouldOverride(toFile)
     if (!override) {
       return

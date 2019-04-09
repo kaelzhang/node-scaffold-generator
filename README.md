@@ -100,6 +100,8 @@ Creates an instance of scaffold-generator
 
 This method will still substitute the content and the pathname of template files with `options.data`.
 
+`scaffold-generator` will `fs.stat` the types of `from` and `to`, and then determine what things are to be copied. See [Cases](#cases) section for details.
+
 Returns `Promise`
 
 ### .write(to, template)
