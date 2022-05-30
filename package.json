@@ -1,10 +1,11 @@
 {
   "name": "scaffold-generator",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Generates a repo from a specified template and data.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc ava --verbose --timeout=10s",
+    "test": "npm run test:only",
+    "test:only": "nyc ava --verbose --timeout=10s",
     "posttest": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "files": [
