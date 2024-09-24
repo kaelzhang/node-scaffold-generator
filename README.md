@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/kaelzhang/node-scaffold-generator.svg?branch=master)](https://travis-ci.org/kaelzhang/node-scaffold-generator)
+[![Build Status](https://github.com/kaelzhang/node-scaffold-generator/actions/workflows/nodejs.yml/badge.svg)](https://github.com/kaelzhang/node-scaffold-generator/actions/workflows/nodejs.yml)
 [![Coverage](https://codecov.io/gh/kaelzhang/node-scaffold-generator/branch/master/graph/badge.svg)](https://codecov.io/gh/kaelzhang/node-scaffold-generator)
 
 # scaffold-generator
@@ -14,7 +14,7 @@ You are free to safely copy several sources to their destinations with one singl
 ## Installation
 
 ```bash
-npm install scaffold-generator --save
+npm i scaffold-generator --save
 ```
 
 ## Usage

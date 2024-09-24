@@ -6,10 +6,11 @@
   "scripts": {
     "test": "npm run test:only",
     "test:only": "nyc ava --verbose --timeout=10s",
-    "posttest": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "// posttest": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "LICENSE"
   ],
   "keywords": [
     "scaffold",
