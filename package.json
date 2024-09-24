@@ -1,6 +1,6 @@
 {
   "name": "scaffold-generator",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "Generates a repo from a specified template and data.",
   "main": "index.js",
   "scripts": {
@@ -31,19 +31,20 @@
     "url": "https://github.com/kaelzhang/node-scaffold-generator/issues"
   },
   "ava": {
-    "babel": false
+    "files": [
+      "test/*.js"
+    ]
   },
   "devDependencies": {
-    "ava": "^1.4.1",
+    "ava": "^4.0.1",
     "codecov": "^3.3.0",
     "mustache": "^3.0.1",
     "nyc": "^13.3.0",
     "tmp": "^0.1.0"
   },
   "dependencies": {
-    "babel-runtime": "^6.26.0",
     "core-util-is": "^1.0.2",
     "fs-extra": "^8.0.0",
-    "glob-gitignore": "^1.0.14"
+    "glob-gitignore": "^1.0.15"
   }
 }
