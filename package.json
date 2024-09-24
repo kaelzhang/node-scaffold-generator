@@ -1,6 +1,6 @@
 {
   "name": "scaffold-generator",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "description": "Generates a repo from a specified template and data.",
   "main": "index.js",
   "scripts": {
